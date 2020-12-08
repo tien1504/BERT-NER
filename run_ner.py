@@ -14,6 +14,7 @@ import torch.nn.functional as F
 from transformers import (WEIGHTS_NAME, AdamW, BertConfig,
                                   BertForTokenClassification, BertTokenizer,
                                   get_linear_schedule_with_warmup)#WarmupLinearSchedule)
+from transformers import AutoModel, AutoTokenizer
 from torch import nn
 from torch.utils.data import (DataLoader, RandomSampler, SequentialSampler,
                               TensorDataset)
@@ -405,7 +406,8 @@ def main():
     label_list = processor.get_labels()
     num_labels = len(label_list) + 1
 
-    tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
+    #tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
+    tokenizer = AutoTokenizer.from_pretrained(args.bert_model, use_fast=False)
 
     train_examples = None
     num_train_optimization_steps = 0
