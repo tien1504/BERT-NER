@@ -11,9 +11,9 @@ import sys
 import numpy as np
 import torch
 import torch.nn.functional as F
-from pytorch_transformers import (WEIGHTS_NAME, AdamW, BertConfig,
+from transformers import (WEIGHTS_NAME, AdamW, BertConfig,
                                   BertForTokenClassification, BertTokenizer,
-                                  WarmupLinearSchedule)
+                                  get_linear_schedule_with_warmup)#WarmupLinearSchedule)
 from torch import nn
 from torch.utils.data import (DataLoader, RandomSampler, SequentialSampler,
                               TensorDataset)
@@ -154,7 +154,7 @@ class NerProcessor(DataProcessor):
             self._read_tsv(os.path.join(data_dir, "test.txt")), "test")
 
     def get_labels(self):
-        return ["O", "B-MISC", "I-MISC",  "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "[CLS]", "[SEP]"]
+        return ["O", "B-MISCELLANEOUS", "I-MISCELLANEOUS",  "B-PERSON", "I-PERSON", "B-ORGANIZATION", "I-ORGANIZATION", "B-LOCATION", "I-LOCATION", "[CLS]", "[SEP]"]
 
     def _create_examples(self,lines,set_type):
         examples = []
@@ -438,7 +438,8 @@ def main():
         ]
     warmup_steps = int(args.warmup_proportion * num_train_optimization_steps)
     optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate, eps=args.adam_epsilon)
-    scheduler = WarmupLinearSchedule(optimizer, warmup_steps=warmup_steps, t_total=num_train_optimization_steps)
+    #scheduler = WarmupLinearSchedule(optimizer, warmup_steps=warmup_steps, t_total=num_train_optimization_steps)
+    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps, num_training_steps=num_train_optimization_steps)
     if args.fp16:
         try:
             from apex import amp
